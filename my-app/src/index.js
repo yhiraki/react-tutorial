@@ -3,9 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 function Square(props) {
+  const mark = props.bold
+    ? <b>{props.value}</b>
+    : <span>{props.value}</span>;
   return (
     <button className="square" onClick={props.onClick}>
-      {props.value}
+      {mark}
     </button>
   )
 }
@@ -15,6 +18,7 @@ class Board extends React.Component {
     return (
       <Square
         value={this.props.squares[i]}
+        bold={this.props.lastPutAt === i}
         onClick={() => this.props.onClick(i)}
       />
     );
@@ -114,6 +118,7 @@ class Game extends React.Component {
         <div className="game-board">
           <Board
             squares={current.squares}
+            lastPutAt={current.lastPutAt}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
