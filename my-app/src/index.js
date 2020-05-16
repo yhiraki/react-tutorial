@@ -46,7 +46,8 @@ class Game extends React.Component {
         lastPutAt: -1
       }],
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      historyOrderByAsc: true
     }
   }
 
@@ -77,24 +78,34 @@ class Game extends React.Component {
     })
   }
 
+  historyOrderToggle() {
+    this.setState({
+      historyOrderByAsc: !this.state.historyOrderByAsc
+    });
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move :
-        'Go to game start';
-      const p = idx2xy(step.lastPutAt);
+    let moves =
+      history.map((step, move) => {
+        const desc = move ?
+          'Go to move #' + move :
+          'Go to game start';
+        const p = idx2xy(step.lastPutAt);
 
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-          {p[0] >= 0 && `(${p[0]}, ${p[1]})`}
-        </li>
-      )
-    })
+        return (
+          <li key={move}>
+            <button onClick={() => this.jumpTo(move)}>{desc}</button>
+            {p[0] >= 0 && `(${p[0]}, ${p[1]})`}
+          </li>
+        )
+      })
+    if (!this.state.historyOrderByAsc) {
+      moves.reverse();
+    }
 
     let status;
     if (winner) {
@@ -114,6 +125,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <button onClick={() => { this.historyOrderToggle() }}>order toggle</button>
           <ol>{moves}</ol>
         </div>
       </div>
