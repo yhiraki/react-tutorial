@@ -1,48 +1,43 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import Board from './Board';
 
-function Square(props) {
-  const markClass = props.highlihgted ? 'highlighted' : '';
-  const mark = props.bold
-    ? <b>{props.value}</b>
-    : <span>{props.value}</span>;
-  return (
-    <button className='square' onClick={props.onClick}>
-      <span className={markClass}>{mark}</span>
-    </button>
-  )
-}
 
-class Board extends React.Component {
-  renderSquare(i, options = {}) {
-    return (
-      <Square
-        key={i}
-        value={this.props.squares[i]}
-        bold={this.props.lastPutAt === i}
-        highlihgted={options.highlihgted}
-        onClick={() => this.props.onClick(i)}
-      />
-    );
+const calculateWinner = (squares) => {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return {
+        gameIsEnd: true,
+        winner: squares[a],
+        line: [a, b, c]
+      };
+    }
   }
 
-  render() {
-    const a3 = Array(3).fill(null);
-    return (
-      a3.fill(null).map((_, i) =>
-        <div className="board-row" key={i}>
-          {a3.fill(null).map((_, j) => {
-            const idx = i * 3 + j;
-            return this.renderSquare(idx, {
-              highlihgted: this.props.wonLine.includes(idx)
-            })
-          })}
-        </div>
-      )
-    );
-  }
+  const gameIsEnd = squares.every(v => v != null);
+
+  return {
+    gameIsEnd: gameIsEnd,
+    winner: null,
+    line: []
+  };
 }
+
+const idx2xy = (i) => {
+  return [i % 3, parseInt(i / 3)];
+}
+
 
 class Game extends React.Component {
   constructor(props) {
@@ -96,7 +91,7 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const { gameIsEnd, winner, line } = calculateWinner(current.squares);
 
-    let moves =
+    const moves =
       history.map((step, move) => {
         const desc = move ?
           'Go to move #' + move :
@@ -114,14 +109,11 @@ class Game extends React.Component {
       moves.reverse();
     }
 
-    let status;
-    if (winner) {
-      status = 'Winner: ' + winner;
-    } else if (gameIsEnd) {
-      status = 'Draw';
-    } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
+    const status = (() => {
+      if (winner) return 'Winner: ' + winner;
+      if (gameIsEnd) return 'Draw';
+      return 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    });
 
     return (
       <div className="game">
@@ -143,45 +135,4 @@ class Game extends React.Component {
   }
 }
 
-// ========================================
-
-ReactDOM.render(
-  <Game />,
-  document.getElementById('root')
-);
-
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return {
-        gameIsEnd: true,
-        winner: squares[a],
-        line: [a, b, c]
-      };
-    }
-  }
-
-  const gameIsEnd = squares.every(v => v != null);
-
-  return {
-    gameIsEnd: gameIsEnd,
-    winner: null,
-    line: []
-  };
-}
-
-function idx2xy(i) {
-  return [i % 3, parseInt(i / 3)];
-}
+export default Game;
