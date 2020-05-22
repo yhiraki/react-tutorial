@@ -1,6 +1,18 @@
 import React from 'react';
 
-const Square = (props) => {
+type Mark = 'X' | 'O';
+export type SquareValue = (Mark|null);
+export type Squares = SquareValue[];
+
+type Props = {
+  key: number,
+  value: SquareValue,
+  bold: boolean,
+  highlihgted?: boolean,
+  onClick: ()=>void
+}
+
+const Square = (props:Props) => {
   const markClass = props.highlihgted ? 'highlighted' : '';
   const mark = props.bold
     ? <b>{props.value}</b>

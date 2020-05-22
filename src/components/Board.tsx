@@ -1,9 +1,20 @@
 import React from 'react';
-import Square from './Square.jsx';
+import Square, { Squares } from './Square';
 
 
-class Board extends React.Component {
-  renderSquare(i, options = {}) {
+type Props = {
+  squares: Squares,
+  lastPutAt: number,
+  onClick: (i: number) => void,
+  wonLine: number[]
+}
+
+type RenderOptions = {
+  highlihgted?: boolean
+}
+
+class Board extends React.Component<Props, {}> {
+  renderSquare(i: number, options: RenderOptions = {}) {
     return (
       <Square
         key={i}
@@ -15,7 +26,7 @@ class Board extends React.Component {
     );
   }
 
-  generateBoard(cols, rows) {
+  generateBoard(cols: number, rows: number) {
     const c = Array(cols).fill(null);
     const r = Array(rows).fill(null);
     return (

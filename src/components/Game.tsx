@@ -1,8 +1,15 @@
 import React from 'react';
+import { SquareValue, Squares } from './Square';
 import Board from './Board';
 
 
-const calculateWinner = (squares) => {
+type GameEndStatus = {
+  gameIsEnd: boolean,
+  winner: SquareValue,
+  line: [number, number, number] | []
+}
+
+const calculateWinner = (squares: Squares): GameEndStatus => {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -34,13 +41,28 @@ const calculateWinner = (squares) => {
   };
 }
 
-const idx2xy = (i) => {
-  return [i % 3, parseInt(i / 3)];
+const idx2xy = (i: number): [number, number] => {
+  return [i % 3, Math.floor(i / 3)];
 }
 
 
-class Game extends React.Component {
-  constructor(props) {
+type Props = {}
+
+type History = {
+  squares: Squares,
+  lastPutAt: number
+}
+
+type State = {
+  history: History[],
+  stepNumber: number,
+  xIsNext: boolean,
+  historyOrderByAsc: boolean
+}
+
+
+class Game extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       history: [{
@@ -53,10 +75,10 @@ class Game extends React.Component {
     }
   }
 
-  handleClick(i) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
-    const squares = current.squares.slice();
+  handleClick(i: number) {
+    const history: History[] = this.state.history.slice(0, this.state.stepNumber + 1);
+    const current: History = history[history.length - 1];
+    const squares: Squares = current.squares.slice();
 
     if (calculateWinner(squares).winner || squares[i]) {
       return;
@@ -73,7 +95,7 @@ class Game extends React.Component {
     });
   }
 
-  jumpTo(step) {
+  jumpTo(step: number) {
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0
@@ -109,11 +131,11 @@ class Game extends React.Component {
       moves.reverse();
     }
 
-    const status = (() => {
+    const status: string = (() => {
       if (winner) return 'Winner: ' + winner;
       if (gameIsEnd) return 'Draw';
       return 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    });
+    })();
 
     return (
       <div className="game">
