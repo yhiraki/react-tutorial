@@ -1,32 +1,33 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import Square, { Squares } from './Square';
 
+export type Line = [number, number, number];
 
 type Props = {
   squares: Squares,
   lastPutAt: number,
   onClick: (i: number) => void,
-  wonLine: number[]
+  wonLine?: Line
 }
 
 type RenderOptions = {
   highlihgted?: boolean
 }
 
-class Board extends React.Component<Props, {}> {
-  renderSquare(i: number, options: RenderOptions = {}) {
+const Board: React.FC<Props> = ({ squares, lastPutAt, onClick, wonLine }) => {
+  const renderSquare = (i: number, options: RenderOptions = {}): ReactElement => {
     return (
       <Square
         key={i}
-        value={this.props.squares[i]}
-        bold={this.props.lastPutAt === i}
+        value={squares[i]}
+        bold={lastPutAt === i}
         highlihgted={options.highlihgted}
-        onClick={() => this.props.onClick(i)}
+        onClick={() => onClick(i)}
       />
     );
   }
 
-  generateBoard(cols: number, rows: number) {
+  const generateBoard = (cols: number, rows: number): ReactElement[] => {
     const c = Array(cols).fill(null);
     const r = Array(rows).fill(null);
     return (
@@ -34,18 +35,18 @@ class Board extends React.Component<Props, {}> {
         <div className="board-row" key={i}> {
           r.map((_, j) => {
             const idx = i * 3 + j;
-            return this.renderSquare(idx, {
-              highlihgted: this.props.wonLine.includes(idx)
-            })
+            return renderSquare(idx, { highlihgted: wonLine && wonLine.includes(idx) })
           })
         } </div>
       )
     );
   }
 
-  render() {
-    return this.generateBoard(3, 3);
-  }
+  return (
+    <>
+      {generateBoard(3, 3)}
+    </>
+  );
 }
 
 export default Board;
